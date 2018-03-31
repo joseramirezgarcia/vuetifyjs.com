@@ -5,7 +5,7 @@ import Grid from './Grid'
 import GridLists from './GridLists'
 import PreDefined from './PreDefined'
 import PreMadeThemes from './PreMadeThemes'
-// TODO: import Sandbox from './Sandbox'
+// "TODO": import Sandbox from './Sandbox'
 import Spacing from './Spacing'
 
 export default {
@@ -16,6 +16,6 @@ export default {
   GridLists,
   PreDefined,
   PreMadeThemes,
-  // TODO: Sandbox,
+  // "TODO": Sandbox,
   Spacing
 }
