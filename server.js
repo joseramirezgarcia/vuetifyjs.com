@@ -88,6 +88,8 @@ app.get('/sitemap.xml', (req, res) => {
   res.sendFile(resolve('./static/sitemap.xml'))
 })
 
+app.use('/api/translation', require('./translation/router'))
+
 // 301 redirect for changed routes
 Object.keys(redirects).forEach(k => {
   app.get(k, (req, res) => res.redirect(301, redirects[k]))

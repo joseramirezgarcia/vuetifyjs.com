@@ -22,7 +22,6 @@
       position: 'relative',
       right: 0,
       top: 0,
-      list: [],
       isBooted: false,
       timeout: null
     }),
@@ -41,13 +40,28 @@
           position: this.position,
           top: `${parseInt(this.top)}px`
         }
-      }
-    },
+      },
+      list () {
+        const list = []
 
-    watch: {
-      isBooted () {
-        this.genList()
-      }
+        if (!this.isBooted) return list
+
+        for (let item of this.items) {
+          item = Object.assign({}, item)
+
+          const target = item.target ||
+            document.getElementById(item.href)
+
+          if (target) {
+            item.offsetTop = target.offsetTop
+            item.target = target
+
+            list.push(item)
+          }
+        }
+
+        return list
+      },
     },
 
     mounted () {
@@ -74,7 +88,7 @@
               borderLeft: `2px solid ${isActive ? this.$vuetify.theme.primary : 'transparent'}`
             },
             props: { href: '#' },
-            domProps: { innerText: item.text },
+            domProps: { innerText: this.$t(item.text) },
             on: {
               click (e) {
                 e.stopPropagation()
@@ -90,25 +104,6 @@
           })
         ])
       },
-      genList () {
-        const list = []
-
-        for (let item of this.items) {
-          item = Object.assign({}, item)
-
-          const target = item.target ||
-            document.getElementById(item.href)
-
-          if (target) {
-            item.offsetTop = target.offsetTop
-            item.target = target
-
-            list.push(item)
-          }
-        }
-
-        this.list = list
-      },
       onScroll () {
         clearTimeout(this.timeout)
 
@@ -121,7 +116,6 @@
         this.top = shouldFloat ? 85 : 0
 
         this.timeout = setTimeout(() => {
-          requestAnimationFrame(this.genList)
           this.isBooted = true
         }, 100)
       }
@@ -169,4 +163,9 @@
       text-decoration: none
       border-left: 2px solid transparent
       transition: color .1s ease-in
+
+    .translate-btn
+      right: 0px
+      transform: translateX(20px)
+
 </style>

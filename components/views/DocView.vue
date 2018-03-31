@@ -23,7 +23,9 @@
   import AppAd from '@/components/core/AppAd'
   import AppFooterAlt from '@/components/core/AppFooterAlt'
   import AppTableOfContents from '@/components/core/AppTableOfContents'
+  import { mapState } from 'vuex'
   import { camel } from '@/util/helpers'
+  import { getObjectValueByPath } from 'vuetify/es5/util/helpers'
 
   export default {
     components: {
@@ -34,21 +36,19 @@
 
     props: {
       toc: {
-        type: Array,
-        default: () => ([])
+        type: String
       }
     },
 
     computed: {
+      ...mapState({
+        tocs: state => state.app.tablesOfContents
+      }),
       header () {
-        const header = `${this.namespace}.header`
-
-        return this.$t(header)
+        return `${this.namespace}.header`
       },
       headerText () {
-        const headerText = `${this.namespace}.headerText`
-
-        return this.$t(headerText)
+        return `${this.namespace}.headerText`
       },
       namespace () {
         const route = this.$route.path.split('/').slice(2)
@@ -59,15 +59,28 @@
         return route.map(s => camel(s)).join('.')
       },
       computedToc () {
-        if (this.toc.length > 0) return this.toc
+        console.log(this.tocs, this.namespace, this.toc)
 
-        const toc = `${this.namespace}.toc`
+        return getObjectValueByPath(this.tocs, this.toc || this.namespace) || []
 
+        /*
+        const toc = $t(`${this.namespace}.toc`)
+        return toc
+
+        return toc.map(i => {
+          return {
+            href: i.href,
+            text: `${this.namespace}.${i.text}`
+          }
+        })
+        */
+        /*
         return this.$te(toc)
           ? this.$t(toc)
           : this.$te(toc, 'en')
             ? this.$t(toc, 'en')
             : []
+        */
       }
     }
   }

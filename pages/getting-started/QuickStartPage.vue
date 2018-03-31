@@ -20,7 +20,9 @@
                   v-icon(dark v-else v-for="icon in browser.icon" :key="icon").browser-icon--split fab fa-{{ icon }}
                 v-list-tile-content
                   v-list-tile-title {{ browser.title }}
-                  v-list-tile-sub-title {{ getBrowserSupport(browser) }}
+                  v-list-tile-sub-title
+                    translate-btn(:value="getBrowserSupport(browser)")
+                    span {{ $t(getBrowserSupport(browser)) }}
 
       section#cdn-install
         section-head(:value="`${namespace}.cdnHeader`")
@@ -127,9 +129,9 @@
 
     methods: {
       getBrowserSupport (browser) {
-        if (browser.supported === true) return this.$t('GettingStarted.QuickStart.browserSupport.supported')
-        else if (browser.supported === false) return this.$t('GettingStarted.QuickStart.browserSupport.notSupported')
-        else return this.$t(`GettingStarted.QuickStart.browserSupport.${browser.supported}`)
+        if (browser.supported === true) return 'GettingStarted.QuickStart.browserSupport.supported'
+        else if (browser.supported === false) return 'GettingStarted.QuickStart.browserSupport.notSupported'
+        else return `GettingStarted.QuickStart.browserSupport.${browser.supported}`
       }
     }
   }
@@ -143,4 +145,8 @@
       clip: rect(0px 21px 40px 0px)
     &:nth-child(2)
       clip: rect(0px 40px 40px 22px)
+
+  .list .translate-btn
+    right: 0px
+    transform: none
 </style>

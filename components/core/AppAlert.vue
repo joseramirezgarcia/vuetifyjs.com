@@ -4,6 +4,7 @@
     :icon="computedIcon"
     value
   ).my-4.app-alert
+    translate-btn(:value="value")
     markdown(:source="$t(value)")
 </template>
 
@@ -55,8 +56,11 @@
   }
 </script>
 
-<style>
-  .app-alert p {
-    margin: 0 !important;
-  }
+<style lang="stylus">
+  .app-alert
+    p
+      margin: 0 !important
+
+    .translate-btn
+      transform: translateX(-90px)
 </style>

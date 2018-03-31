@@ -1,5 +1,7 @@
 <template lang="pug">
-  markdown(:source="$t(value)")
+  div
+    translate-btn(:value="value")
+    markdown(:source="$t(value)")
 </template>
 
 <script>

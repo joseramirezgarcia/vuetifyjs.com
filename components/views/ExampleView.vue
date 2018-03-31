@@ -202,7 +202,7 @@
             : []
       },
       toc () {
-        return this.$t(this.data.toc || `Generic.Pages.toc`)
+        return 'Components'
       },
       usage () {
         return this.examples.slice(0, 1).shift()

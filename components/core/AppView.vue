@@ -3,6 +3,7 @@
     v-fade-transition(mode="out-in")
       router-view(:key="$route.path")
     //- app-footer
+    translation-bar
 </template>
 
 <script>

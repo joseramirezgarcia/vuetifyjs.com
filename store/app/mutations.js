@@ -29,5 +29,12 @@ export default {
       to: false,
       timeout: 6000
     }, payload)
+  },
+  TRANSLATE: (state, payload) => {
+    state.showTranslationBar = true
+    state.translationKey = payload
+  },
+  SHOW_TRANSLATION_BAR: (state, payload) => {
+    state.showTranslationBar = payload
   }
 }

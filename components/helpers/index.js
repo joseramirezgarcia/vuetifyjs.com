@@ -6,6 +6,8 @@ import PageHead from './PageHead'
 import Parameters from './Parameters'
 import SectionHead from './SectionHead'
 import SectionText from './SectionText'
+import TranslateBtn from './TranslateBtn'
+import TranslationBar from './TranslationBar'
 
 export default {
   Codepen,
@@ -15,5 +17,7 @@ export default {
   PageHead,
   Parameters,
   SectionHead,
-  SectionText
+  SectionText,
+  TranslateBtn,
+  TranslationBar
 }
