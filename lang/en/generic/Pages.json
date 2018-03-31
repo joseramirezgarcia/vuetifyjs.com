@@ -12,28 +12,13 @@
   "slots": "Slots",
   "supplemental": "Supplemental",
   "type": "Type",
-  "toc": [
-    {
-      "text": "Introduction",
-      "href": "introduction"
-    },
-    {
-      "text": "Usage",
-      "href": "usage"
-    },
-    {
-      "text": "API",
-      "href": "api"
-    },
-    {
-      "text": "Supplemental",
-      "href": "supplemental"
-    },
-    {
-      "text": "Examples",
-      "href": "examples"
-    }
-  ],
+  "toc": {
+    "introduction": "Introduction",
+    "usage": "Usage",
+    "api": "API",
+    "supplemental": "Supplemental",
+    "examples": "Examples"
+  },
   "usage": "Usage",
   "parameters": "Parameters",
   "return": "Returns",
