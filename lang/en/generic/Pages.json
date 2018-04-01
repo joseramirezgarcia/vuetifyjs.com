@@ -12,13 +12,7 @@
   "slots": "Slots",
   "supplemental": "Supplemental",
   "type": "Type",
-  "toc": {
-    "introduction": "Introduction",
-    "usage": "Usage",
-    "api": "API",
-    "supplemental": "Supplemental",
-    "examples": "Examples"
-  },
+  "introduction": "Introduction",
   "usage": "Usage",
   "parameters": "Parameters",
   "return": "Returns",

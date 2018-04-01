@@ -1,13 +1,13 @@
 import en from './en'
-import ru from './ru'
-import ko from './ko'
-import zhHans from './zhHans'
 import ja from './ja'
+import ko from './ko'
+import ru from './ru'
+import zhHans from './zhHans'
 
-export {
+export default {
   en,
-  ru,
+  ja,
   ko,
-  zhHans,
-  ja
+  ru,
+  zhHans
 }

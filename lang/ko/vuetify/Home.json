@@ -48,5 +48,8 @@
   },
   "becomeSponsor": "Become a Sponsor",
   "proudlySponsoredBy": "Patreon Sponsors",
-  "callout": "Vue와 머티리얼 디자인의 힘으로 여러분의 개발을 한단계 높이세요"
+  "callout": "Vue와 머티리얼 디자인의 힘으로 여러분의 개발을 한단계 높이세요",
+  "features[0]": {
+    "title": "준비된 프로젝트 템플릿2"
+  }
 }
