@@ -69,6 +69,7 @@ const serve = (path, cache) => express.static(resolve(path), {
   maxAge: cache && isProd ? 1000 * 60 * 60 * 24 * 30 : 0
 })
 
+app.use(express.json())
 app.use(cookieParser())
 app.use(compression({ threshold: 0 }))
 app.use(favicon('./static/favicon.ico'))
@@ -88,7 +89,9 @@ app.get('/sitemap.xml', (req, res) => {
   res.sendFile(resolve('./static/sitemap.xml'))
 })
 
-app.use('/api/translation', require('./translation/router'))
+if (process.env.TRANSLATE) {
+  app.use('/api/translation', require('./translation/router'))
+}
 
 // 301 redirect for changed routes
 Object.keys(redirects).forEach(k => {

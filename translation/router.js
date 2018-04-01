@@ -1,7 +1,10 @@
-var fs = require('fs')
-var express = require('express')
-var simpleGit = require('simple-git/promise')
-var diffJson = require('diff-json')
+const express = require('express')
+const simpleGit = require('simple-git/promise')
+const diffJson = require('diff-json')
+const helpers = require('vuetify/es5/util/helpers')
+const fs = require('fs-extra')
+const path = require('path')
+
 var router = express.Router()
 
 var git = simpleGit()
@@ -20,7 +23,7 @@ function getPaths (locale, key) {
   return {
     sourcePath: `./lang/en/${folderParts}/${fileName}.json`,
     localePath: `./lang/${locale}/${folderParts}/${fileName}.json`,
-    keyPath: keyParts
+    fileKey: keyParts.join('.')
   }
 }
 
@@ -59,14 +62,10 @@ async function getLog (path, opts = {}) {
   return git.log({ file: path, ...opts })
 }
 
-async function getLatestCommit (path, opts = {}) {
-  return (await getLog(path, opts)).latest
-}
-
 async function getJsonContent (path, hash) {
   const raw = await git.raw([
-      'show',
-      `${hash}:./${path}`
+    'show',
+    `${hash}:./${path}`
   ])
 
   try {
@@ -74,14 +73,6 @@ async function getJsonContent (path, hash) {
   } catch (err) {
     return {}
   }
-}
-
-async function getFirstCommitHash () {
-  return (await git.raw([
-    'rev-list',
-    '--max-parents=0',
-    'HEAD'
-  ])).replace('\ne', '')
 }
 
 function getPreviousCommit (log, commit) {
@@ -95,57 +86,178 @@ function getPreviousCommit (log, commit) {
   return null
 }
 
-async function checkIfOutdated (locale, key) {
-  const { sourcePath, localePath } = getPaths(locale, key)
-  const keyParts = key.split('.')
+const cache = {}
 
-  const sourceLog = await getLog(sourcePath)
-  const localeLog = await getLog(localePath)
+async function checkIfOutdated (locale, key) {
+  const { sourcePath, localePath, fileKey } = getPaths(locale, key)
+
+  // setup cache
+  if (!cache[sourcePath]) {
+    cache[sourcePath] = {
+      logs: null,
+      json: {}
+    }
+  }
+  if (!cache[localePath]) {
+    cache[localePath] = {
+      logs: null,
+      json: {}
+    }
+  }
+
+  // If no file exists yet
+  // translation is missing
+  if (!fs.existsSync(localePath)) return 'missing'
+
+  // If file exists but
+  // key is missing
+  const localeJson = await fs.readJson(localePath)
+  if (!helpers.getObjectValueByPath(localeJson, fileKey)) return 'missing'
+
+  // Get git logs for both source and locale
+  const localeLog = cache[localePath].logs || await getLog(localePath)
+  const sourceLog = cache[sourcePath].logs || await getLog(sourcePath)
+
+  // Make sure to cache result
+  cache[sourcePath].logs = sourceLog
+  cache[localePath].logs = localeLog
+
+  // If file is not commited, there's not much we can do
+  if (localeLog.total === 0) return 'unchanged'
 
   const latestSourceCommitDate = new Date(sourceLog.latest.date)
   const latestLocaleCommitDate = new Date(localeLog.latest.date)
 
+  // If source has been updated after latest locale
+  // then we might have a mismatch
   if (latestSourceCommitDate > latestLocaleCommitDate) {
     const previousCommit = getPreviousCommit(sourceLog, localeLog.latest)
 
     if (!previousCommit) throw new Error('asdasdas')
 
-    const oldJson = await getJsonContent(sourcePath, previousCommit.hash)
-    const newJson = await getJsonContent(sourcePath, sourceLog.latest.hash)
+    const oldJson = cache[sourcePath].json[previousCommit.hash] || await getJsonContent(sourcePath, previousCommit.hash)
+    const newJson = cache[sourcePath].json[sourceLog.latest.hash] || await getJsonContent(sourcePath, sourceLog.latest.hash)
+
+    cache[sourcePath].json[previousCommit.hash] = oldJson
+    cache[sourcePath].json[sourceLog.latest.hash] = newJson
 
     const changes = diffJson.diff(oldJson, newJson)
-    const change = changes.find(c => c.key === keyParts[keyParts.length - 1])
+    const change = changes.find(c => c.key === fileKey)
+
+    if (!change) return 'unchanged'
 
     if (change.type === 'update') return 'updated'
     else if (change.type === 'add') return 'added'
-    else return 'unknown'
+    else if (change.type === 'remove') return 'removed'
+    return 'unknown'
   }
 
   return 'unchanged'
 }
 
-// middleware that is specific to this router
-router.use(function timeLog (req, res, next) {
-  console.log('Time: ', Date.now())
-  next()
-})
+async function updateIndexFiles (filePath) {
+  const dir = path.dirname(filePath)
 
-router.put('/', async function (req, res) {
-  const { locale, key, value } = req.body
+  const files = (await getAllFiles(dir, true, false)).filter(f => !f.includes('index.js'))
 
-  if (!locale || !key || !value) {
-    res.send({ error: 'missing data' })
+  const exports = files.map(f => path.basename(f, '.json'))
+  const imports = exports.map(f => `import ${f} from './${f}'`).join('\n')
+  const index = `${imports}\n\nexport default {\n${exports.map(e => '  ' + e).join(',\n')}\n}\n`
+
+  await fs.writeFile(`${dir}/index.js`, index)
+}
+
+async function updateTranslation (locale, key, value) {
+  const { localePath, fileKey } = getPaths(locale, key)
+
+  if (!fs.existsSync(localePath)) {
+    await fs.writeJson(localePath, {})
   }
-
-  const { localePath, keyPath } = getPaths(locale, key)
 
   const data = await loadJson(localePath)
 
-  update(data, keyPath, value)
+  update(data, fileKey.split('.'), value)
 
-  await saveJson(localePath, data)
+  console.log(localePath, data)
 
-  res.send({ localePath, keyPath, data, value })
+  await fs.writeJson(localePath, data, { spaces: 2 })
+
+  await updateIndexFiles(localePath)
+}
+
+async function getAllFiles (dir, includeDirs = false, recurse = true) {
+  return (await fs.readdir(dir)).reduce(async (files, file) => {
+    const name = path.join(dir, file)
+    const isDirectory = (await fs.stat(name)).isDirectory()
+
+    const f = await files
+
+    // if (isDirectory && includeDirs) f.push(name)
+
+    return isDirectory && recurse ? [...f, ...(await getAllFiles(name))] : [...f, name]
+  }, [])
+}
+
+async function newTranslation (title, locale, country) {
+  const localePath = `./lang/${locale}`
+
+  if (fs.existsSync(localePath)) {
+    throw new Error('locale already exists!')
+  }
+
+  await fs.copy('./lang/en', localePath)
+
+  const jsonFiles = (await getAllFiles(localePath)).filter(f => f.endsWith('.json'))
+
+  jsonFiles.forEach(async (file) => {
+    await fs.writeJson(file, {})
+  })
+
+  const languages = await fs.readJson('./i18n/languages.json')
+
+  languages.push({
+    title,
+    locale,
+    country
+  })
+
+  await fs.writeJson('./i18n/languages.json', languages, { spaces: 2 })
+
+  await updateIndexFiles('./lang/dummy')
+}
+
+router.post('/new', async function (req, res) {
+  try {
+    const { title, locale, country } = req.body
+
+    if (!title || !locale || !country) {
+      res.send({ error: 'missing data' })
+    }
+
+    await newTranslation(title, locale, country)
+
+    res.send({ status: 'ok' })
+  } catch (err) {
+    console.log('new', err)
+    res.status(500).send({ error: JSON.stringify(err) })
+  }
+})
+
+router.put('/', async function (req, res) {
+  try {
+    const { locale, key, value } = req.body
+
+    if (!locale || !key || !value) {
+      res.send({ error: 'missing data' })
+    }
+
+    await updateTranslation(locale, key, value)
+
+    res.send({ status: 'unchanged' })
+  } catch (err) {
+    console.log('save', err)
+    res.status(500).send({ error: JSON.stringify(err) })
+  }
 })
 
 router.get('/status', async function (req, res) {
@@ -156,12 +268,16 @@ router.get('/status', async function (req, res) {
 
     res.send({ status })
   } catch (err) {
-    res.send({ err })
+    console.log('status', err)
+    res.status(500).send({ error: JSON.stringify(err) })
   }
 })
 
 async function run () {
-  console.log(await checkIfOutdated('ko', 'GettingStarted.QuickStart.header'))
+  // console.log(await checkIfOutdated('ko', 'Components.Alerts.examples.closable.desc'))
+  // console.log(await checkIfOutdated('ko', 'Generic.Pages.introduction'))
+  // console.log(await updateTranslation('ko', 'GettingStarted.SponsorsAndBackers.header', 'new header'))
+  // console.log(await newTranslation('Svenska', 'sv', 'se'))
 }
 
 run()
