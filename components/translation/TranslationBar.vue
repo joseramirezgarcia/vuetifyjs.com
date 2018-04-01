@@ -1,29 +1,33 @@
-<template>
-  <v-bottom-sheet hide-overlay persistent v-model="showTranslationBar">
-    <v-card>
-      <v-container fluid grid-list-md>
-        <v-layout>
-          <v-flex>
-            <v-text-field
+<template lang="pug">
+  v-bottom-sheet(hide-overlay persistent v-model="showBar")
+    v-card
+      v-container(fluid)
+        v-layout(wrap row)
+          v-flex(xs6 pr-2)
+            v-text-field(
               label="Original"
               disabled
               textarea
-              :value="$t(translationKey, 'en')"
-            ></v-text-field>
-          </v-flex>
-          <v-flex>
-            <v-text-field
+              hide-details
+              :value="$t(currentKey, 'en')")
+          v-flex(xs6 pl-2)
+            v-text-field(
               label="Translation"
               textarea
-              v-model="value"
-            ></v-text-field>
-          </v-flex>
-        </v-layout>
-      </v-container>
-      <v-btn @click="show(false)">close</v-btn>
-      <v-btn @click="save">save</v-btn>
-    </v-card>
-  </v-bottom-sheet>
+              hide-details
+              v-model="value")
+          v-flex(xs6)
+            v-chip
+              v-avatar(color="warning" class="white--text")
+                span {{ outdatedKeys }}
+              span Outdated
+            v-chip
+              v-avatar(color="error" class="white--text")
+                span {{ missingKeys }}
+              span Missing
+          v-flex(xs6 text-xs-right)
+            v-btn(@click="show(false)" outline color="grey") close
+            v-btn(@click="save" color="primary") save
 </template>
 
 <script>
@@ -31,8 +35,7 @@
 
   import {
     mapMutations,
-    mapState,
-    mapActions
+    mapState
   } from 'vuex'
 
   export default {
@@ -41,24 +44,31 @@
         value: ''
       }
     },
-    watch: {
-      translationKey (v) {
-        console.log(v, this.$t(v))
-        this.value = this.$t(v)
-      }
-    },
     computed: {
       ...mapState({
-        showTranslationBar: state => state.app.showTranslationBar,
-        translationKey: state => state.app.translationKey
-      })
+        buttons: state => state.translation.buttons,
+        showBar: state => state.translation.showBar,
+        currentKey: state => state.translation.currentKey
+      }),
+      outdatedKeys () {
+        return this.buttons.filter(b => b.status === 'updated').length
+      },
+      missingKeys () {
+        return this.buttons.filter(b => b.status === 'missing').length
+      }
+    },
+    watch: {
+      currentKey (v) {
+        console.log(this.$i18n)
+        this.value = this.$te(v) ? this.$t(v) : ''
+      }
     },
     methods: {
-      ...mapMutations('app', {
-        show: 'SHOW_TRANSLATION_BAR'
+      ...mapMutations('translation', {
+        show: 'SHOW_BAR'
       }),
       convert (msg) {
-        const { locale, key, value } = msg
+        const { key, value } = msg
         const parts = key.split('.')
         const data = {}
 
@@ -93,7 +103,7 @@
         const arrayMerge = (target, source, options) => {
           const destination = target.slice()
 
-          source.forEach(function(e, i) {
+          source.forEach(function (e, i) {
             if (typeof destination[i] === 'undefined') {
               const cloneRequested = options.clone !== false
               const shouldClone = cloneRequested && options.isMergeableObject(e)
@@ -112,20 +122,20 @@
       async save () {
         const msg = {
           locale: this.$i18n.locale,
-          key: this.translationKey,
+          key: this.currentKey,
           value: this.value
         }
 
-        // const ok = await this.$store.dispatch('app/saveTranslation', msg)
-        const ok = true
-        console.log(msg)
-        const data = this.convert(msg)
-        console.log(data)
-        const merged = this.merge(msg.locale, data)
-        console.log(merged)
+        const response = await this.$store.dispatch('translation/save', msg)
 
-        if (ok) this.$i18n.setLocaleMessage(msg.locale, merged)
-        // console.log(this.$i18n.getLocaleMessage(msg.locale))
+        if (response.status === 200) {
+          const data = this.convert(msg)
+          const merged = this.merge(msg.locale, data)
+          console.log(merged)
+          this.$i18n.setLocaleMessage(msg.locale, merged)
+          const btn = this.buttons.find(b => b.key === this.currentKey)
+          if (btn) this.$store.commit('translation/UPDATE_BTN', { uid: btn.uid, status: 'unchanged' })
+        }
       }
     }
   }

@@ -5,6 +5,7 @@
 </template>
 
 <script>
+  import { getObjectValueByPath } from 'vuetify/es5/util/helpers'
   import { camel, kebab } from '@/util/helpers'
   import NotFound from '@/pages/general/404Page'
 

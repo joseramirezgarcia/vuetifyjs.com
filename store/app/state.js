@@ -15,29 +15,26 @@ export default () => ({
   loadedLangs: [],
   releases: [],
   stateless: false,
-  showTranslationBar: false,
-  translationKey: null,
-  isTranslating: true,
   tablesOfContents: {
     Components: [
       {
-        text: 'Generic.Pages.toc.introduction',
+        text: 'Generic.Pages.introduction',
         href: 'introduction'
       },
       {
-        text: 'Generic.Pages.toc.usage',
+        text: 'Generic.Pages.usage',
         href: 'usage'
       },
       {
-        text: 'Generic.Pages.toc.api',
+        text: 'Generic.Pages.api',
         href: 'api'
       },
       {
-        text: 'Generic.Pages.toc.supplemental',
+        text: 'Generic.Pages.supplemental',
         href: 'supplemental'
       },
       {
-        text: 'Generic.Pages.toc.examples',
+        text: 'Generic.Pages.examples',
         href: 'examples'
       }
     ],
@@ -104,23 +101,23 @@ export default () => ({
       ],
       Grid: [
         {
-          text: 'Generic.Pages.toc.introduction',
+          text: 'Generic.Pages.introduction',
           href: 'introduction'
         },
         {
-          text: 'Generic.Pages.toc.usage',
+          text: 'Generic.Pages.usage',
           href: 'usage'
         },
         {
-          text: 'Generic.Pages.toc.api',
+          text: 'Generic.Pages.api',
           href: 'api'
         },
         {
-          text: 'Generic.Pages.toc.supplemental',
+          text: 'Generic.Pages.supplemental',
           href: 'supplemental'
         },
         {
-          text: 'Generic.Pages.toc.examples',
+          text: 'Generic.Pages.examples',
           href: 'examples'
         },
         {
@@ -130,17 +127,17 @@ export default () => ({
       ],
       Alignment: [
         {
-          text: 'Generic.Pages.toc.introduction',
+          text: 'Generic.Pages.introduction',
           href: 'introduction'
         },
         {
-          text: 'Generic.Pages.toc.examples',
+          text: 'Generic.Pages.examples',
           href: 'examples'
         }
       ],
       Display: [
         {
-          text: 'Generic.Pages.toc.introduction',
+          text: 'Generic.Pages.introduction',
           href: 'introduction'
         },
         {
@@ -152,13 +149,13 @@ export default () => ({
           href: 'display'
         },
         {
-          text: 'Generic.Pages.toc.examples',
+          text: 'Generic.Pages.examples',
           href: 'examples'
         }
       ],
       Elevation: [
         {
-          text: 'Generic.Pages.toc.introduction',
+          text: 'Generic.Pages.introduction',
           href: 'introduction'
         },
         {
@@ -168,7 +165,7 @@ export default () => ({
       ],
       Spacing: [
         {
-          text: 'Generic.Pages.toc.introduction',
+          text: 'Generic.Pages.introduction',
           href: 'introduction'
         },
         {
@@ -176,7 +173,7 @@ export default () => ({
           href: 'how-it-works'
         },
         {
-          text: 'Generic.Pages.toc.examples',
+          text: 'Generic.Pages.examples',
           href: 'examples'
         },
         {
@@ -192,7 +189,7 @@ export default () => ({
           href: 'introduction'
         },
         {
-          text: 'Generic.Pages.toc.examples',
+          text: 'Generic.Pages.examples',
           href: 'examples'
         },
         {
@@ -262,7 +259,7 @@ export default () => ({
     Style: {
       Colors: [
         {
-          text: 'Generic.Pages.toc.introduction',
+          text: 'Generic.Pages.introduction',
           href: 'introduction'
         },
         {

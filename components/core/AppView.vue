@@ -4,6 +4,7 @@
       router-view(:key="$route.path")
     //- app-footer
     translation-bar
+    create-translation-dialog
 </template>
 
 <script>

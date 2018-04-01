@@ -65,6 +65,11 @@
                 width="24px"
               )
             v-list-tile-title {{language.title}}
+          v-list-tile(
+            v-if="isTranslating"
+            @click="showCreateDialog(true)"
+          )
+            v-list-tile-title New translation
     v-toolbar-items
       v-btn(
         flat
@@ -156,9 +161,9 @@
 
 <script>
   // Utilities
-  import { mapState } from 'vuex'
+  import { mapState, mapMutations } from 'vuex'
   import asyncData from '@/util/asyncData'
-  import languages from '@/i18n/languages'
+  import languages from '@/i18n/languages.json'
 
   export default {
     mixins: [asyncData],
@@ -177,6 +182,9 @@
     }),
 
     computed: {
+      ...mapState('translation', [
+        'isTranslating'
+      ]),
       ...mapState('app', [
         'appToolbar',
         'isFullscreen',
@@ -208,6 +216,9 @@
     },
 
     methods: {
+      ...mapMutations({
+        showCreateDialog: 'translation/SHOW_CREATE_DIALOG'
+      }),
       changeToRelease (release) {
         // Remove language setting
         const path = this.$route.fullPath.split('/')
