@@ -37,9 +37,24 @@
         translate: 'TRANSLATE'
       }),
       async fetchStatus () {
-        const response = await this.$store.dispatch('app/getTranslationStatus', { locale: this.$i18n.locale, key: this.value })
+        try {
+          const response = await this.$store.dispatch('app/getTranslationStatus', { locale: this.$i18n.locale, key: this.value })
 
-        this.color = response.data.outdated ? 'warning' : 'grey'
+          if (response.status === 200 && response.data.status) {
+            switch (response.data.status) {
+              case 'updated':
+                this.color = 'warning'
+                break
+              case 'added':
+                this.color = 'error'
+                break
+              default:
+                this.color = 'grey'
+            }
+          }
+        } catch (err) {
+          console.log(err)
+        }
       }
     }
   }

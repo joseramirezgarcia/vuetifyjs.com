@@ -97,10 +97,10 @@ function getPreviousCommit (log, commit) {
 
 async function checkIfOutdated (locale, key) {
   const { sourcePath, localePath } = getPaths(locale, key)
+  const keyParts = key.split('.')
 
   const sourceLog = await getLog(sourcePath)
   const localeLog = await getLog(localePath)
-  console.log(sourceLog)
 
   const latestSourceCommitDate = new Date(sourceLog.latest.date)
   const latestLocaleCommitDate = new Date(localeLog.latest.date)
@@ -109,16 +109,19 @@ async function checkIfOutdated (locale, key) {
     const previousCommit = getPreviousCommit(sourceLog, localeLog.latest)
 
     if (!previousCommit) throw new Error('asdasdas')
-    console.log(previousCommit.hash, sourceLog.latest.hash)
 
     const oldJson = await getJsonContent(sourcePath, previousCommit.hash)
     const newJson = await getJsonContent(sourcePath, sourceLog.latest.hash)
 
     const changes = diffJson.diff(oldJson, newJson)
-    console.log(changes)
+    const change = changes.find(c => c.key === keyParts[keyParts.length - 1])
+
+    if (change.type === 'update') return 'updated'
+    else if (change.type === 'add') return 'added'
+    else return 'unknown'
   }
 
-  return latestSourceCommitDate > latestLocaleCommitDate
+  return 'unchanged'
 }
 
 // middleware that is specific to this router
@@ -149,9 +152,9 @@ router.get('/status', async function (req, res) {
   try {
     const { locale, key } = req.query
 
-    const outdated = await checkIfOutdated(locale, key)
+    const status = await checkIfOutdated(locale, key)
 
-    res.send({ outdated })
+    res.send({ status })
   } catch (err) {
     res.send({ err })
   }
