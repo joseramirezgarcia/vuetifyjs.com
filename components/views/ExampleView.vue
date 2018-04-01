@@ -79,7 +79,7 @@
         template(v-for="(example, i) in examples.slice(1)")
           support-vuetify(v-if="i === 5" :key="i")
           example(
-            :header="`${example.header}`"
+            :header="example.header"
             :new-in="example.new"
             :file="`${folder}/${example.file}`"
             :inverted="example.inverted"
@@ -96,7 +96,7 @@
 <script>
   import api from '@/api/api'
   // Utilities
-  import { camel } from '@/util/helpers'
+  import { camel, capitalize } from '@/util/helpers'
 
   export default {
     inheritAttrs: false,
@@ -179,9 +179,11 @@
         const examples = this.data.examples || {}
 
         return Object.keys(examples).map(key => {
-          return Object.assign({
-            file: key
-          }, examples[key])
+          return Object.assign(examples[key], {
+            file: key,
+            desc: `${this.namespace}.examples.${key}.desc`,
+            header: `${this.namespace}.examples.${key}.header`
+          })
         })
       },
       folder () {

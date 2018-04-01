@@ -36,7 +36,8 @@
 
     props: {
       toc: {
-        type: String
+        type: String,
+        default: null
       }
     },
 
@@ -59,28 +60,7 @@
         return route.map(s => camel(s)).join('.')
       },
       computedToc () {
-        console.log(this.tocs, this.namespace, this.toc)
-
         return getObjectValueByPath(this.tocs, this.toc || this.namespace) || []
-
-        /*
-        const toc = $t(`${this.namespace}.toc`)
-        return toc
-
-        return toc.map(i => {
-          return {
-            href: i.href,
-            text: `${this.namespace}.${i.text}`
-          }
-        })
-        */
-        /*
-        return this.$te(toc)
-          ? this.$t(toc)
-          : this.$te(toc, 'en')
-            ? this.$t(toc, 'en')
-            : []
-        */
       }
     }
   }

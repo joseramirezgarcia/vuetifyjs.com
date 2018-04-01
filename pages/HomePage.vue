@@ -66,16 +66,21 @@
               ).mb-2
               v-card-text
                 h3(
-                  v-text="feature.title"
                   style="font-size: 18px; font-weight: 500;"
-                ).mb-3.text-xs-center
-                p(v-text="feature.text").text-xs-center.mb-2
+                ).mb-3.text-xs-center.feature-title
+                  translate-btn(:value="`Vuetify.Home.features[${i}].title`")
+                  | {{ feature.title}}
+                p.text-xs-justify.mb-2.feature-text
+                  translate-btn(:value="`Vuetify.Home.features[${i}].text`")
+                  | {{ feature.text }}
 
     section#sponsors-and-backers.my-5
       v-container
         v-layout
           v-flex(xs12)
-            h2(v-text="$t('Vuetify.Home.proudlySponsoredBy')").text-xs-center.headline.mb-3.grey--text
+            h2.text-xs-center.headline.mb-3.grey--text
+              translate-btn(value="Vuetify.Home.proudlySponsoredBy")
+              | {{ $t('Vuetify.Home.proudlySponsoredBy') }}
             v-layout(row wrap justify-center align-center)
               template(v-for="(supporter, i) in supporters")
                 v-flex(
@@ -110,6 +115,7 @@
     section#checked-features.mb-5
       v-container
         h2.text-xs-center.headline.mb-5.grey--text
+          translate-btn(value="Vuetify.Home.checkFeaturesTitle")
           span {{ $t("Vuetify.Home.checkFeaturesTitle") }}
           | {{ $t("Vuetify.Home.checkFeaturesTitleCtd") }}
         v-layout(row wrap justify-center)
@@ -127,6 +133,7 @@
                 color="green"
                 size="36px"
               ).mr-3 check
+              translate-btn(:value="`Vuetify.Home.checkFeatures[${i}]`")
               span.subheading {{ feature }}
           v-flex(
             mx-3
@@ -142,11 +149,13 @@
                 color="green"
                 size="36px"
               ).mr-3 check
+              translate-btn(:value="`Vuetify.Home.checkFeaturesCtd[${i}]`")
               span.subheading {{ feature }}
 
     section#using-vuetify.mb-5
       v-container(grid-list-xl)
         h2.text-xs-center.headline.mb-5.grey--text
+          translate-btn(value="Vuetify.Home.madeWithVuetify")
           span {{ $t("Vuetify.Home.madeWithVuetify") }}
         v-layout(wrap)
           v-flex(
@@ -350,4 +359,10 @@
 <style lang="stylus" scoped>
   .social
     text-decoration: none
+
+  .feature-text
+    .translate-btn
+      right: 0px
+      bottom: 0px
+      transform: translateX(0px)
 </style>

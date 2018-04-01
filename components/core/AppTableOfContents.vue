@@ -61,7 +61,7 @@
         }
 
         return list
-      },
+      }
     },
 
     mounted () {
@@ -78,6 +78,11 @@
         const vm = this
 
         return this.$createElement('li', [
+          this.$createElement('translate-btn', {
+            props: {
+              value: item.text
+            }
+          }),
           this.$createElement('a', {
             staticClass: 'subheading mb-3 d-block',
             'class': {

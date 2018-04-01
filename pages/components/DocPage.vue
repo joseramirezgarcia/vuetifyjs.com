@@ -53,11 +53,17 @@
       examples () {
         const examples = `${this.computedSection}.${this.computedComponent}.examples`
 
+        const lang = this.$i18n.messages[this.$i18n.locale]
+
+        return getObjectValueByPath(lang, examples)
+
+        /*
         return this.$te(examples)
-          ? this.$t(examples)[0]
+          ? this.$t(examples)
           : this.$te(examples, 'en')
-            ? this.$t(examples, 'en')[0]
+            ? this.$t(examples, 'en')
             : []
+        */
       },
       exists () {
         return this.components.length > 0 || this.examples.length > 0
