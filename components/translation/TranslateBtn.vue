@@ -26,7 +26,7 @@
         isTranslating: state => state.translation.isTranslating
       }),
       status () {
-        const state = this.buttons.find(b => b.uid === this._uid)
+        const state = this.buttons.find(b => b.key === this.value)
         return state ? state.status : 'unchanged'
       },
       color () {
@@ -44,10 +44,10 @@
       }
     },
     created () {
-      this.$store.commit('translation/REGISTER_BTN', { uid: this._uid, key: this.value, status: 'unchanged' })
+      this.$store.commit('translation/REGISTER_BTN', { key: this.value, status: 'unchanged' })
     },
     beforeDestroy () {
-      this.$store.commit('translation/UNREGISTER_BTN', { uid: this._uid })
+      this.$store.commit('translation/UNREGISTER_BTN', { key: this.value })
     },
     methods: {
       ...mapMutations('translation', {
@@ -67,7 +67,7 @@
           if (response.status === 200 && response.data.status) {
             let status = response.data.status
 
-            this.$store.commit('translation/UPDATE_BTN', { uid: this._uid, status })
+            this.$store.commit('translation/UPDATE_BTN', { key: this.value, status })
           }
         } catch (err) {
           console.log(err)

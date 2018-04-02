@@ -133,8 +133,7 @@
           const merged = this.merge(msg.locale, data)
           console.log(merged)
           this.$i18n.setLocaleMessage(msg.locale, merged)
-          const btn = this.buttons.find(b => b.key === this.currentKey)
-          if (btn) this.$store.commit('translation/UPDATE_BTN', { uid: btn.uid, status: 'unchanged' })
+          this.$store.commit('translation/UPDATE_BTN', { key: this.currentKey, status: 'unchanged' })
         }
       }
     }
