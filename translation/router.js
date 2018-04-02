@@ -155,14 +155,14 @@ async function checkIfOutdated (locale, key) {
   return 'unchanged'
 }
 
-async function updateIndexFiles (filePath) {
+async function updateIndexFiles (filePath, defaultExport = true) {
   const dir = path.dirname(filePath)
 
   const files = (await getAllFiles(dir, true, false)).filter(f => !f.includes('index.js'))
 
   const exports = files.map(f => path.basename(f, '.json'))
   const imports = exports.map(f => `import ${f} from './${f}'`).join('\n')
-  const index = `${imports}\n\nexport default {\n${exports.map(e => '  ' + e).join(',\n')}\n}\n`
+  const index = `${imports}\n\nexport ${defaultExport ? 'default ' : ''}{\n${exports.map(e => '  ' + e).join(',\n')}\n}\n`
 
   await fs.writeFile(`${dir}/index.js`, index)
 }
@@ -223,7 +223,7 @@ async function newTranslation (title, locale, country) {
 
   await fs.writeJson('./i18n/languages.json', languages, { spaces: 2 })
 
-  await updateIndexFiles('./lang/dummy')
+  await updateIndexFiles('./lang/dummy', false)
 }
 
 router.post('/new', async function (req, res) {

@@ -4,7 +4,7 @@ import ko from './ko'
 import ru from './ru'
 import zhHans from './zhHans'
 
-export default {
+export {
   en,
   ja,
   ko,
