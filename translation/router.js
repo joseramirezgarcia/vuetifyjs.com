@@ -38,26 +38,6 @@ function update (obj, path, value) {
   return obj
 }
 
-async function loadJson (path) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(path, 'utf8', (err, data) => {
-      if (err) return reject(err)
-
-      return resolve(JSON.parse(data))
-    })
-  })
-}
-
-async function saveJson (path, data) {
-  return new Promise((resolve, reject) => {
-    fs.writeFile(path, JSON.stringify(data, null, 2), 'utf8', (err, data) => {
-      if (err) return reject(err)
-
-      return resolve()
-    })
-  })
-}
-
 async function getLog (path, opts = {}) {
   return git.log({ file: path, ...opts })
 }
@@ -174,7 +154,7 @@ async function updateTranslation (locale, key, value) {
     await fs.writeJson(localePath, {})
   }
 
-  const data = await loadJson(localePath)
+  const data = await fs.readJson(localePath)
 
   update(data, fileKey.split('.'), value)
 
