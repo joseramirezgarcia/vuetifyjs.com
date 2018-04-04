@@ -59,7 +59,6 @@
     },
     watch: {
       currentKey (v) {
-        console.log(this.$i18n)
         this.value = this.$te(v) ? this.$t(v) : ''
       }
     },
@@ -67,34 +66,29 @@
       ...mapMutations('translation', {
         show: 'SHOW_BAR'
       }),
-      convert (msg) {
-        const { key, value } = msg
-        const parts = key.split('.')
-        const data = {}
+      update (obj, path, value) {
+        let pointer = obj
+        for (let i = 0; i < path.length; i++) {
+          const p = path[i]
+          const matches = p.match(/(.*)\[(\d+)\](\.)?/)
+          const isArray = matches && matches.length > 1
 
-        let obj = data
-        for (let i = 0; i < parts.length; i++) {
-          const part = parts[i]
+          const key = isArray ? matches[1] : p
 
-          // We have array, let's get original
-          // value in locale message and merge
-          const matches = part.match(/\[(\d+)\]/)
-          if (matches) {
-            const partWithoutIndex = part.replace(/\[\d+\]/, '')
-            const index = matches[1]
-            const path = [...parts.slice(0, parts.findIndex(p => p === part)), partWithoutIndex].join('.')
-            const arr = this.$t(path)
-            console.log(partWithoutIndex, index, path, arr)
+          if (pointer[key] === undefined) pointer[key] = isArray ? [] : {}
 
-            obj[partWithoutIndex] = arr
-            obj = obj[partWithoutIndex][index]
-          } else if (i < parts.length - 1) {
-            obj[part] = {}
-            obj = obj[part]
-          } else obj[part] = value
+          if (i === path.length - 1) {
+            if (isArray) pointer[key][matches[2]] = value
+            else pointer[key] = value
+          } else {
+            if (isArray) {
+              pointer[key][matches[2]] = {}
+              pointer = pointer[key][matches[2]]
+            } else pointer = pointer[key]
+          }
         }
 
-        return data
+        return obj
       },
       merge (locale, data) {
         const emptyTarget = value => Array.isArray(value) ? [] : {}
@@ -110,8 +104,8 @@
               destination[i] = shouldClone ? clone(e, options) : e
             } else if (options.isMergeableObject(e)) {
               destination[i] = deepmerge(target[i], e, options)
-            } else if (target.indexOf(e) === -1) {
-              destination.push(e)
+            } else if (target.indexOf(e) === -1 && e !== null) {
+              destination[i] = e
             }
           })
           return destination
@@ -129,9 +123,7 @@
         const response = await this.$store.dispatch('translation/save', msg)
 
         if (response.status === 200) {
-          const data = this.convert(msg)
-          const merged = this.merge(msg.locale, data)
-          console.log(merged)
+          const merged = this.merge(msg.locale, response.data)
           this.$i18n.setLocaleMessage(msg.locale, merged)
           this.$store.commit('translation/UPDATE_BTN', { key: this.currentKey, status: 'unchanged' })
         }
