@@ -249,7 +249,7 @@ router.put('/', async function (req, res) {
 
     await updateTranslation(locale, key, value)
 
-    res.send({ status: 'unchanged' })
+    res.send(update({}, key.split('.'), value))
   } catch (err) {
     console.log('save', err)
     res.status(500).send({ error: JSON.stringify(err) })
@@ -274,6 +274,10 @@ async function run () {
   // console.log(await checkIfOutdated('ko', 'Generic.Pages.introduction'))
   // console.log(await updateTranslation('ko', 'GettingStarted.SponsorsAndBackers.header', 'new header'))
   // console.log(await newTranslation('Svenska', 'sv', 'se'))
+  // let data = update({ GettingStarted: {} }, ['GettingStarted', 'arr[1]'], 'hello')
+  // console.log(update(data, ['GettingStarted', 'arr[0]'], 'world'))
+  // let data = update({ GettingStarted: {} }, ['GettingStarted', 'arr[1]', 'test'], 'hello')
+  // console.log(JSON.stringify(data))
 }
 
 run()
