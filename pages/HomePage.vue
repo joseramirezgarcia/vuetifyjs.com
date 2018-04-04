@@ -152,14 +152,14 @@
                 color="green"
                 size="36px"
               ).mr-3 check
-              translate-btn(:value="`Vuetify.Home.checkFeaturesCtd[${i}]`")
-              span.subheading {{ feature }}
+              translatable(:i18n="`Vuetify.Home.checkFeaturesCtd[${i}]`")
+                span.subheading {{ $t(`Vuetify.Home.checkFeaturesCtd[${i}]`) }}
 
     section#using-vuetify.mb-5
       v-container(grid-list-xl)
         h2.text-xs-center.headline.mb-5.grey--text
-          translate-btn(value="Vuetify.Home.madeWithVuetify")
-          span {{ $t("Vuetify.Home.madeWithVuetify") }}
+          translatable(i18n="Vuetify.Home.madeWithVuetify")
+            span {{ $t("Vuetify.Home.madeWithVuetify") }}
         v-layout(wrap)
           v-flex(
             v-for="(feature, i) in computedFeatured"
@@ -206,7 +206,8 @@
                   height="64px"
                   width="64px"
                 ).mb-2
-                span(v-text="$t('Vuetify.Home.callout')").subheading
+                translatable(i18n="Vuetify.Home.callout")
+                  span(v-text="$t('Vuetify.Home.callout')").subheading
 
         v-layout(justify-center).mb-3
           a(

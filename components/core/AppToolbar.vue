@@ -34,8 +34,9 @@
         v-show="isHome"
         :to="{ name: 'getting-started/QuickStart' }"
       )
-        span.hidden-md-and-up {{ $t('Vuetify.AppToolbar.docs' )}}
-        span.hidden-sm-and-down {{ $t('Vuetify.AppToolbar.documentation' )}}
+        translatable(:i18n="$vuetify.breakpoint.mdAndUp ? 'Vuetify.AppToolbar.documentation' : 'Vuetify.AppToolbar.docs'")
+          span.hidden-md-and-up {{ $t('Vuetify.AppToolbar.docs' )}}
+          span.hidden-sm-and-down {{ $t('Vuetify.AppToolbar.documentation' )}}
       v-menu(
         bottom
         offset-y
@@ -77,8 +78,9 @@
         v-show="!isStore"
         :to="{ name: 'store/Index' }"
       )
-        span.hidden-sm-and-down {{ $t('Vuetify.AppToolbar.store' )}}
-        v-icon(:right="$vuetify.breakpoint.mdAndUp") store
+        translatable(i18n="Vuetify.AppToolbar.store")
+          span.hidden-sm-and-down {{ $t('Vuetify.AppToolbar.store' )}}
+          v-icon(:right="$vuetify.breakpoint.mdAndUp") store
 
     v-toolbar-items
       v-menu(
@@ -94,8 +96,9 @@
           slot="activator"
           style="min-width: 64px"
         )
-          span.hidden-sm-and-down {{ $t('Vuetify.AppToolbar.ecosystem' )}}
-          v-icon(:right="$vuetify.breakpoint.mdAndUp") mdi-earth
+          translatable(i18n="Vuetify.AppToolbar.ecosystem")
+            span.hidden-sm-and-down {{ $t('Vuetify.AppToolbar.ecosystem' )}}
+            v-icon(:right="$vuetify.breakpoint.mdAndUp") mdi-earth
         v-list(light)
           v-subheader(light) {{ $t('Vuetify.AppToolbar.quickLinks' )}}
           v-list-tile(

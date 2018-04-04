@@ -78,11 +78,11 @@
         const vm = this
 
         return this.$createElement('li', [
-          this.$createElement('translate-btn', {
+          this.$createElement('translatable', {
             props: {
-              value: item.text
+              i18n: item.text
             }
-          }),
+          }, [
           this.$createElement('a', {
             staticClass: 'subheading mb-3 d-block',
             'class': {
@@ -107,6 +107,7 @@
               }
             }
           })
+        ])
         ])
       },
       onScroll () {
@@ -163,7 +164,7 @@
     margin: 0 24px
     width: 200px
 
-    li > a
+    li a
       padding-left: 18px
       text-decoration: none
       border-left: 2px solid transparent

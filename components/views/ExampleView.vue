@@ -88,7 +88,6 @@
             :key="example.file"
             :desc="example.desc"
           )
-      section-head {{ $t('Generic.Pages.examples') }}
 
       slot
 </template>
@@ -96,7 +95,7 @@
 <script>
   import api from '@/api/api'
   // Utilities
-  import { camel, capitalize } from '@/util/helpers'
+  import { camel } from '@/util/helpers'
 
   export default {
     inheritAttrs: false,

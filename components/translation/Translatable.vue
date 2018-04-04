@@ -1,6 +1,6 @@
 <template lang="pug">
   v-badge(v-model="isTranslating" left :color="color")
-    v-icon(dark slot="badge" @click="translate(i18n)") mode_edit
+    v-icon(dark slot="badge" @click.capture.prevent="translate(i18n)") mode_edit
     slot
 </template>
 
@@ -11,7 +11,7 @@
   } from 'vuex'
 
   export default {
-    name: 'translatable',
+    name: 'Translatable',
 
     inheritAttrs: false,
 

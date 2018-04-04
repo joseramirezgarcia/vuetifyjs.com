@@ -1,6 +1,6 @@
 <template lang="pug">
   div.text-xs-justify
-    translate-btn(:value="value")
+    translatable(:i18n="value")
     markdown(:source="$t(value)")
 </template>
 

@@ -8,12 +8,12 @@
         style="text-decoration: none;"
       ).mr-2
         v-icon(color="accent") mdi-pound
-      translate-btn(:value="header")
-      span(v-text="$t(header)")
+      translatable(:i18n="header")
+        span(v-text="$t(header)")
 
     //- Description
-    translate-btn(v-if="$te(desc, 'en')" :value="desc")
-    markdown(v-if="$te(desc, 'en')" :source="$t(desc)")
+    translatable(v-if="$te(desc, 'en')" :i18n="desc")
+      markdown(:source="$t(desc)")
 
     v-card(:class="{ 'elevation-0': readonly }").mt-4
       //- Example options

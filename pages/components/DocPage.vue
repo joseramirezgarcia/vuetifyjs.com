@@ -53,18 +53,9 @@
       },
       examples () {
         const examples = `${this.computedSection}.${this.computedComponent}.examples`
-
-        const lang = this.$i18n.messages[this.$i18n.locale]
+        const lang = this.$i18n.getLocaleMessage('en')
 
         return getObjectValueByPath(lang, examples)
-
-        /*
-        return this.$te(examples)
-          ? this.$t(examples)
-          : this.$te(examples, 'en')
-            ? this.$t(examples, 'en')
-            : []
-        */
       },
       exists () {
         return this.components.length > 0 || this.examples.length > 0

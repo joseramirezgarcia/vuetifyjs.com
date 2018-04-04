@@ -14,15 +14,15 @@
               v-for="browser in browsers"
               v-bind:key="browser.title"
             ).px-0
-              v-list-tile(avatar tag="ul")
-                v-list-tile-avatar(:color="browser.supported ? browser.supported === 'polyfill' ? 'warning' : 'success' : 'error'")
-                  v-icon(dark v-if="typeof browser.icon === 'string'") fab fa-{{ browser.icon }}
-                  v-icon(dark v-else v-for="icon in browser.icon" :key="icon").browser-icon--split fab fa-{{ icon }}
-                v-list-tile-content
-                  v-list-tile-title {{ browser.title }}
-                  v-list-tile-sub-title
-                    translate-btn(:value="getBrowserSupport(browser)")
-                    span {{ $t(getBrowserSupport(browser)) }}
+              translatable(:i18n="getBrowserSupport(browser)")
+                v-list-tile(avatar tag="ul")
+                  v-list-tile-avatar(:color="browser.supported ? browser.supported === 'polyfill' ? 'warning' : 'success' : 'error'")
+                    v-icon(dark v-if="typeof browser.icon === 'string'") fab fa-{{ browser.icon }}
+                    v-icon(dark v-else v-for="icon in browser.icon" :key="icon").browser-icon--split fab fa-{{ icon }}
+                  v-list-tile-content
+                    v-list-tile-title {{ browser.title }}
+                    v-list-tile-sub-title
+                      span {{ $t(getBrowserSupport(browser)) }}
 
       section#cdn-install
         section-head(:value="`${namespace}.cdnHeader`")
