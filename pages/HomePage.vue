@@ -26,14 +26,15 @@
             ).display-3
               div(v-text="$t('Vuetify.Home.materialDesign')")
               div(v-text="$t('Vuetify.Home.componentFramework')")
-            v-btn(
-              :to="{ name: 'getting-started/QuickStart' }"
-              class="primary--text"
-              color="white"
-              large
-              style="min-width: 128px;"
-            )
-              | {{ $t("Vuetify.Home.getStarted") }}
+            translatable(i18n="Vuetify.Home.getStarted")
+              v-btn(
+                :to="{ name: 'getting-started/QuickStart' }"
+                class="primary--text"
+                color="white"
+                large
+                style="min-width: 128px;"
+              )
+                | {{ $t('Vuetify.Home.getStarted') }}
             v-btn(
               color="white"
               href="https://github.com/vuetifyjs/vuetify"
@@ -68,19 +69,19 @@
                 h3(
                   style="font-size: 18px; font-weight: 500;"
                 ).mb-3.text-xs-center.feature-title
-                  translate-btn(:value="`Vuetify.Home.features[${i}].title`")
-                  | {{ feature.title}}
+                  translatable(:i18n="`Vuetify.Home.features[${i}].title`")
+                    span {{ $t(`Vuetify.Home.features[${i}].title`) }}
                 p.text-xs-justify.mb-2.feature-text
-                  translate-btn(:value="`Vuetify.Home.features[${i}].text`")
-                  | {{ feature.text }}
+                  translatable(:i18n="`Vuetify.Home.features[${i}].text`")
+                    span {{ $t(`Vuetify.Home.features[${i}].text`) }}
 
     section#sponsors-and-backers.my-5
       v-container
         v-layout
           v-flex(xs12)
             h2.text-xs-center.headline.mb-3.grey--text
-              translate-btn(value="Vuetify.Home.proudlySponsoredBy")
-              | {{ $t('Vuetify.Home.proudlySponsoredBy') }}
+              translatable(i18n="Vuetify.Home.proudlySponsoredBy")
+                span {{ $t('Vuetify.Home.proudlySponsoredBy') }}
             v-layout(row wrap justify-center align-center)
               template(v-for="(supporter, i) in supporters")
                 v-flex(
@@ -104,20 +105,22 @@
                     :style="{ maxHeight: `${supporter.size}px` }"
                   )
               v-flex(xs12).text-xs-center.mt-3
-                v-btn(
-                  :to="{ name: 'getting-started/SponsorsAndBackers' }"
-                  color="primary"
-                  large
-                  outline
-                ) {{ $t("Vuetify.Home.becomeSponsor") }}
-                  v-icon(right color="primary") chevron_right
+                translatable(i18n="Vuetify.Home.becomeSponsor")
+                  v-btn(
+                    :to="{ name: 'getting-started/SponsorsAndBackers' }"
+                    color="primary"
+                    large
+                    outline
+                  ) {{ $t("Vuetify.Home.becomeSponsor") }}
+                    v-icon(right color="primary") chevron_right
 
     section#checked-features.mb-5
       v-container
         h2.text-xs-center.headline.mb-5.grey--text
-          translate-btn(value="Vuetify.Home.checkFeaturesTitle")
-          span {{ $t("Vuetify.Home.checkFeaturesTitle") }}
-          | {{ $t("Vuetify.Home.checkFeaturesTitleCtd") }}
+          translatable(i18n="Vuetify.Home.checkFeaturesTitle")
+            span {{ $t("Vuetify.Home.checkFeaturesTitle") }}
+          translatable(i18n="Vuetify.Home.checkFeaturesTitleCtd")
+            span {{ $t("Vuetify.Home.checkFeaturesTitleCtd") }}
         v-layout(row wrap justify-center)
           v-flex(
             mx-3
@@ -133,8 +136,8 @@
                 color="green"
                 size="36px"
               ).mr-3 check
-              translate-btn(:value="`Vuetify.Home.checkFeatures[${i}]`")
-              span.subheading {{ feature }}
+              translatable(:i18n="`Vuetify.Home.checkFeatures[${i}]`")
+                span.subheading {{ $t(`Vuetify.Home.checkFeatures[${i}]`) }}
           v-flex(
             mx-3
             :shrink="$vuetify.breakpoint.mdAndUp"
@@ -275,16 +278,16 @@
 
     computed: {
       checkFeatures () {
-        return this.$t('Vuetify.Home.checkFeatures')
+        return this.$t('Vuetify.Home.checkFeatures', 'en')
       },
       checkFeaturesCtd () {
-        return this.$t('Vuetify.Home.checkFeaturesCtd')
+        return this.$t('Vuetify.Home.checkFeaturesCtd', 'en')
       },
       computedFeatured () {
         return this.featured.slice(0, 6)
       },
       features () {
-        return this.$t('Vuetify.Home.features').slice().reverse()
+        return this.$t('Vuetify.Home.features', 'en')
       },
       letterFromAuthor () {
         return this.$t('Vuetify.Home.letterFromAuthor')
