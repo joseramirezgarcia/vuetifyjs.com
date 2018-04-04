@@ -28,12 +28,26 @@ function getPaths (locale, key) {
 }
 
 function update (obj, path, value) {
-  const key = path.pop()
-  const pointer = path.reduce((accumulator, currentValue) => {
-    if (accumulator[currentValue] === undefined) accumulator[currentValue] = {}
-    return accumulator[currentValue]
-  }, obj)
-  pointer[key] = value
+  let pointer = obj
+  for (let i = 0; i < path.length; i++) {
+    const p = path[i]
+    const matches = p.match(/(.*)\[(\d+)\](\.)?/)
+    const isArray = matches && matches.length > 1
+
+    const key = isArray ? matches[1] : p
+
+    if (pointer[key] === undefined) pointer[key] = isArray ? [] : {}
+
+    if (i === path.length - 1) {
+      if (isArray) pointer[key][matches[2]] = value
+      else pointer[key] = value
+    } else {
+      if (isArray) {
+        pointer[key][matches[2]] = {}
+        pointer = pointer[key][matches[2]]
+      } else pointer = pointer[key]
+    }
+  }
 
   return obj
 }
