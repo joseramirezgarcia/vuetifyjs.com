@@ -164,7 +164,11 @@ async function updateIndexFiles (filePath, defaultExport = true) {
 async function updateTranslation (locale, key, value) {
   const { localePath, fileKey } = getPaths(locale, key)
 
+  // if (!fs.existsSync(localePath)) {
+  //   await fs.writeJson(localePath, {})
+  // }
   if (!fs.existsSync(localePath)) {
+    await fs.ensureFile(localePath)
     await fs.writeJson(localePath, {})
   }
 
