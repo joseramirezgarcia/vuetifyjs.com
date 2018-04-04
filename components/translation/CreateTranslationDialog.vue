@@ -4,21 +4,30 @@
       v-card-title(class="primary")
         h3(class="white--text") Create new translation
       v-card-text
-        v-text-field(
-          label="Title"
-          v-model="title"
-          placeholder="English"
-        )
-        v-text-field(
-          label="Locale"
-          v-model="locale"
-          placeholder="en"
-        )
-        v-text-field(
-          label="Country"
-          v-model="country"
-          placeholder="us"
-        )
+        div.mb-3
+          v-text-field(
+            label="Title"
+            v-model="title"
+            placeholder="English"
+            hint="Name of language written in that language (e.g 日本語 for Japanese)"
+            persistent-hint
+          )
+        div.mb-3
+          v-text-field(
+            label="Locale code"
+            v-model="locale"
+            placeholder="en"
+            hint="Use tag and/or subtag property from <a href=\"http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry\">this</a> reference"
+            persistent-hint
+          )
+        div.mb-3
+          v-text-field(
+            label="Country code"
+            v-model="country"
+            placeholder="us"
+            hint="Use two-letter code from <a href=\"https://countrycode.org/\">this</a> reference"
+            persistent-hint
+          )
         v-btn(@click="create") create
 </template>
 
@@ -51,10 +60,11 @@
           }
 
           const response = await this.$store.dispatch('translation/new', payload)
-          console.log(response)
 
           if (response.status === 200) {
             // TODO: change to newly created language
+            // problem is we have to wait for compilation
+            // to finish. and no way to know?
           }
         } catch (err) {
           console.log(err)
