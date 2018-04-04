@@ -13,6 +13,18 @@ function kebab (str) {
   return (str || '').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
 }
 
+function camel (str) {
+  const camel = (str || '').replace(/-([^-])/g, g => g[1].toUpperCase())
+
+  return capitalize(camel)
+}
+
+function capitalize (str) {
+  str = str || ''
+
+  return `${str.substr(0, 1).toUpperCase()}${str.slice(1)}`
+}
+
 function getPaths (locale, key) {
   const parts = key.split('.')
   const fileParts = parts.filter(p => p[0] === p[0].toUpperCase())
@@ -149,16 +161,22 @@ async function checkIfOutdated (locale, key) {
   return 'unchanged'
 }
 
-async function updateIndexFiles (filePath, defaultExport = true) {
-  const dir = path.dirname(filePath)
+async function updateIndexFiles (filePath, root = false) {
+  let dir = path.dirname(filePath)
 
-  const files = (await getAllFiles(dir, true, false)).filter(f => !f.includes('index.js'))
+  do {
+    const files = (await getAllFiles(dir, true, false)).filter(f => !f.includes('index.js'))
 
-  const exports = files.map(f => path.basename(f, '.json'))
-  const imports = exports.map(f => `import ${f} from './${f}'`).join('\n')
-  const index = `${imports}\n\nexport ${defaultExport ? 'default ' : ''}{\n${exports.map(e => '  ' + e).join(',\n')}\n}\n`
+    const exports = files.map(f => path.basename(f, '.json'))
+    const imports = exports.map(f => `import ${!root ? camel(f) : f} from './${f}'`).join('\n')
+    const index = `${imports}\n\nexport ${!root ? 'default ' : ''}{\n${exports.map(e => '  ' + (!root ? camel(e) : e)).join(',\n')}\n}\n`
 
-  await fs.writeFile(`${dir}/index.js`, index)
+    await fs.writeFile(`${dir}/index.js`, index)
+
+    if (root) return
+
+    dir = dir.split(path.sep).slice(0, -1).join(path.sep)
+  } while (dir.length > 0 && !dir.endsWith('lang'))
 }
 
 async function updateTranslation (locale, key, value) {
@@ -219,7 +237,7 @@ async function newTranslation (title, locale, country) {
 
   await fs.writeJson('./i18n/languages.json', languages, { spaces: 2 })
 
-  await updateIndexFiles(localePath, false)
+  await updateIndexFiles(localePath, true)
 }
 
 router.post('/new', async function (req, res) {
@@ -272,7 +290,7 @@ router.get('/status', async function (req, res) {
 async function run () {
   // console.log(await checkIfOutdated('ko', 'Components.Alerts.examples.closable.desc'))
   // console.log(await checkIfOutdated('ko', 'Generic.Pages.introduction'))
-  // console.log(await updateTranslation('ko', 'GettingStarted.SponsorsAndBackers.header', 'new header'))
+  // console.log(await updateTranslation('sv', 'GettingStarted.SponsorsAndBackers.header', 'new header'))
   // console.log(await newTranslation('Svenska', 'sv', 'se'))
   // let data = update({ GettingStarted: {} }, ['GettingStarted', 'arr[1]'], 'hello')
   // console.log(update(data, ['GettingStarted', 'arr[0]'], 'world'))
