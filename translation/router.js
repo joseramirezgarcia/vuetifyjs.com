@@ -203,13 +203,11 @@ async function newTranslation (title, locale, country) {
     throw new Error('locale already exists!')
   }
 
-  await fs.copy('./lang/en', localePath)
+  await fs.ensureDir(localePath)
 
-  const jsonFiles = (await getAllFiles(localePath)).filter(f => f.endsWith('.json'))
+  const index = `export default {}`
 
-  jsonFiles.forEach(async (file) => {
-    await fs.writeJson(file, {})
-  })
+  await fs.writeFile(path.join(localePath, 'index.js'), index)
 
   const languages = await fs.readJson('./i18n/languages.json')
 
@@ -221,7 +219,7 @@ async function newTranslation (title, locale, country) {
 
   await fs.writeJson('./i18n/languages.json', languages, { spaces: 2 })
 
-  await updateIndexFiles('./lang/dummy', false)
+  await updateIndexFiles(localePath, false)
 }
 
 router.post('/new', async function (req, res) {
