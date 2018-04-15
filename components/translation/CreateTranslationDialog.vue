@@ -67,7 +67,8 @@
             // to finish. and no way to know?
           }
         } catch (err) {
-          console.log(err)
+          // console.log(err)
+          throw err
         } finally {
           this.$store.commit('translation/SHOW_CREATE_DIALOG', false)
         }

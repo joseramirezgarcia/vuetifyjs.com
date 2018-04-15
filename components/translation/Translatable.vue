@@ -46,10 +46,10 @@
       }
     },
     created () {
-      this.$store.commit('translation/REGISTER_BTN', { key: this.i18n, status: 'unchanged' })
+      this.isTranslating && this.$store.commit('translation/REGISTER_BTN', { key: this.i18n, status: 'unchanged' })
     },
     beforeDestroy () {
-      this.$store.commit('translation/UNREGISTER_BTN', { key: this.i18n })
+      this.isTranslating && this.$store.commit('translation/UNREGISTER_BTN', { key: this.i18n })
     },
     methods: {
       ...mapMutations('translation', {
@@ -72,7 +72,8 @@
             this.$store.commit('translation/UPDATE_BTN', { key: this.i18n, status })
           }
         } catch (err) {
-          console.log(err)
+          // console.log(err)
+          throw err
         }
       }
     }
