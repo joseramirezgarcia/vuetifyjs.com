@@ -167,7 +167,7 @@ async function updateIndexFiles (filePath, root = false) {
   do {
     const files = (await getAllFiles(dir, true, false)).filter(f => !f.includes('index.js'))
 
-    const exports = files.map(f => path.basename(f, '.json'))
+    const exports = files.map(f => path.basename(f).replace(/\.json|\.js/, ''))
     const imports = exports.map(f => `import ${!root ? camel(f) : f} from './${f}'`).join('\n')
     const index = `${imports}\n\nexport ${!root ? 'default ' : ''}{\n${exports.map(e => '  ' + (!root ? camel(e) : e)).join(',\n')}\n}\n`
 
