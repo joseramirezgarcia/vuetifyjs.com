@@ -64,18 +64,40 @@ function update (obj, path, value) {
   return obj
 }
 
+const cache = {}
+
+function setupCache (path) {
+  // setup cache
+  if (!cache[path]) {
+    cache[path] = {
+      logs: null,
+      json: {}
+    }
+  }
+}
+
 async function getLog (path, opts = {}) {
-  return git.log({ file: path, ...opts })
+  if (cache[path].logs) return cache[path].logs
+
+  const logs = await git.log({ file: path, ...opts })
+
+  cache[path].logs = logs
+
+  return logs
 }
 
 async function getJsonContent (path, hash) {
+  if (cache[path].json[hash]) return cache[path].json[hash]
+
   const raw = await git.raw([
     'show',
     `${hash}:./${path}`
   ])
 
   try {
-    return JSON.parse(raw)
+    const json = JSON.parse(raw)
+    cache[path].json[hash] = json
+    return json
   } catch (err) {
     return {}
   }
@@ -92,24 +114,12 @@ function getPreviousCommit (log, commit) {
   return null
 }
 
-const cache = {}
-
-async function checkIfOutdated (locale, key) {
+async function checkStatus (locale, key) {
+  console.log(locale, key)
   const { sourcePath, localePath, fileKey } = getPaths(locale, key)
 
-  // setup cache
-  if (!cache[sourcePath]) {
-    cache[sourcePath] = {
-      logs: null,
-      json: {}
-    }
-  }
-  if (!cache[localePath]) {
-    cache[localePath] = {
-      logs: null,
-      json: {}
-    }
-  }
+  setupCache(sourcePath)
+  setupCache(localePath)
 
   // If no file exists yet
   // translation is missing
@@ -121,12 +131,8 @@ async function checkIfOutdated (locale, key) {
   if (!helpers.getObjectValueByPath(localeJson, fileKey)) return 'missing'
 
   // Get git logs for both source and locale
-  const localeLog = cache[localePath].logs || await getLog(localePath)
-  const sourceLog = cache[sourcePath].logs || await getLog(sourcePath)
-
-  // Make sure to cache result
-  cache[sourcePath].logs = sourceLog
-  cache[localePath].logs = localeLog
+  const localeLog = await getLog(localePath)
+  const sourceLog = await getLog(sourcePath)
 
   // If file is not commited, there's not much we can do
   if (localeLog.total === 0) return 'unchanged'
@@ -137,7 +143,7 @@ async function checkIfOutdated (locale, key) {
   const modifiedDate = new Date(mtime)
   const commitDate = new Date(localeLog.latest.date)
   if (modifiedDate > commitDate) {
-    const commitJson = cache[sourcePath].json[localeLog.latest.hash] || await getJsonContent(localePath, localeLog.latest.hash)
+    const commitJson = await getJsonContent(localePath, localeLog.latest.hash)
     if (helpers.getObjectValueByPath(commitJson, fileKey) !== helpers.getObjectValueByPath(localeJson, fileKey)) return 'new'
   }
 
@@ -151,11 +157,8 @@ async function checkIfOutdated (locale, key) {
 
     if (!previousCommit) throw new Error('asdasdas')
 
-    const oldJson = cache[sourcePath].json[previousCommit.hash] || await getJsonContent(sourcePath, previousCommit.hash)
-    const newJson = cache[sourcePath].json[sourceLog.latest.hash] || await getJsonContent(sourcePath, sourceLog.latest.hash)
-
-    cache[sourcePath].json[previousCommit.hash] = oldJson
-    cache[sourcePath].json[sourceLog.latest.hash] = newJson
+    const oldJson = await getJsonContent(sourcePath, previousCommit.hash)
+    const newJson = await getJsonContent(sourcePath, sourceLog.latest.hash)
 
     const changes = diffJson.diff(oldJson, newJson)
     const change = changes.find(c => c.key === fileKey)
@@ -201,8 +204,6 @@ async function updateTranslation (locale, key, value) {
 
   update(data, fileKey.split('.'), value)
 
-  console.log(localePath, data)
-
   await fs.writeJson(localePath, data, { spaces: 2 })
 
   await updateIndexFiles(localePath)
@@ -247,6 +248,17 @@ async function newTranslation (title, locale, country) {
   await updateIndexFiles(localePath, true)
 }
 
+router.use(function (req, res, next) {
+  if (req.body && req.body.locale) {
+    req.body.locale = req.body.locale.replace('-', '')
+  }
+  if (req.query && req.query.locale) {
+    req.query.locale = req.query.locale.replace('-', '')
+  }
+
+  next()
+})
+
 router.post('/new', async function (req, res) {
   try {
     const { title, locale, country } = req.body
@@ -285,7 +297,7 @@ router.get('/status', async function (req, res) {
   try {
     const { locale, key } = req.query
 
-    const status = await checkIfOutdated(locale, key)
+    const status = await checkStatus(locale, key)
 
     res.send({ status })
   } catch (err) {
@@ -296,7 +308,7 @@ router.get('/status', async function (req, res) {
 
 async function run () {
   // console.log(await checkIfOutdated('ko', 'Components.Alerts.examples.closable.desc'))
-  // console.log(await checkIfOutdated('ko', 'GettingStarted.QuickStart.header'))
+  console.log(await checkStatus('ko', 'GettingStarted.QuickStart.header'))
   // console.log(await updateTranslation('ko', 'GettingStarted.SponsorsAndBackers.header', 'new header'))
   // console.log(await newTranslation('Svenska', 'sv', 'se'))
   // let data = update({ GettingStarted: {} }, ['GettingStarted', 'arr[1]'], 'hello')

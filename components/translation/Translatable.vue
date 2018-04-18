@@ -38,12 +38,18 @@
           case 'new': return 'success'
           default: return 'grey'
         }
+      },
+      locale () {
+        return this.$i18n.locale
       }
     },
     watch: {
       value: {
         handler: 'fetchStatus',
         immediate: true
+      },
+      locale: {
+        handler: 'fetchStatus'
       }
     },
     created () {
@@ -65,7 +71,8 @@
         if (!this.isTranslating || this.i18n.length <= 0) return
 
         try {
-          const response = await this.$store.dispatch('translation/status', { locale: this.$i18n.locale, key: this.i18n })
+          const msg = { locale: this.locale, key: this.i18n }
+          const response = await this.$store.dispatch('translation/status', msg)
 
           if (response.status === 200 && response.data.status) {
             let status = response.data.status
