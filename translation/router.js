@@ -115,8 +115,8 @@ async function checkIfOutdated (locale, key) {
   // translation is missing
   if (!fs.existsSync(localePath)) return 'missing'
 
-  // If file exists but
-  // key is missing
+  // If file exists but no key found
+  // then we are missing translation
   const localeJson = await fs.readJson(localePath)
   if (!helpers.getObjectValueByPath(localeJson, fileKey)) return 'missing'
 
@@ -130,6 +130,16 @@ async function checkIfOutdated (locale, key) {
 
   // If file is not commited, there's not much we can do
   if (localeLog.total === 0) return 'unchanged'
+
+  // If file is newer than latest commit
+  // and value is changed then it's new
+  const { mtime } = await fs.stat(localePath)
+  const modifiedDate = new Date(mtime)
+  const commitDate = new Date(localeLog.latest.date)
+  if (modifiedDate > commitDate) {
+    const commitJson = cache[sourcePath].json[localeLog.latest.hash] || await getJsonContent(localePath, localeLog.latest.hash)
+    if (helpers.getObjectValueByPath(commitJson, fileKey) !== helpers.getObjectValueByPath(localeJson, fileKey)) return 'new'
+  }
 
   const latestSourceCommitDate = new Date(sourceLog.latest.date)
   const latestLocaleCommitDate = new Date(localeLog.latest.date)
@@ -182,9 +192,6 @@ async function updateIndexFiles (filePath, root = false) {
 async function updateTranslation (locale, key, value) {
   const { localePath, fileKey } = getPaths(locale, key)
 
-  // if (!fs.existsSync(localePath)) {
-  //   await fs.writeJson(localePath, {})
-  // }
   if (!fs.existsSync(localePath)) {
     await fs.ensureFile(localePath)
     await fs.writeJson(localePath, {})
@@ -289,8 +296,8 @@ router.get('/status', async function (req, res) {
 
 async function run () {
   // console.log(await checkIfOutdated('ko', 'Components.Alerts.examples.closable.desc'))
-  // console.log(await checkIfOutdated('ko', 'Generic.Pages.introduction'))
-  // console.log(await updateTranslation('sv', 'GettingStarted.SponsorsAndBackers.header', 'new header'))
+  // console.log(await checkIfOutdated('ko', 'GettingStarted.QuickStart.header'))
+  // console.log(await updateTranslation('ko', 'GettingStarted.SponsorsAndBackers.header', 'new header'))
   // console.log(await newTranslation('Svenska', 'sv', 'se'))
   // let data = update({ GettingStarted: {} }, ['GettingStarted', 'arr[1]'], 'hello')
   // console.log(update(data, ['GettingStarted', 'arr[0]'], 'world'))

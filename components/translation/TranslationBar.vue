@@ -120,12 +120,19 @@
           value: this.value
         }
 
-        const response = await this.$store.dispatch('translation/save', msg)
+        let response = await this.$store.dispatch('translation/save', msg)
 
         if (response.status === 200) {
           const merged = this.merge(msg.locale, response.data)
           this.$i18n.setLocaleMessage(msg.locale, merged)
-          this.$store.commit('translation/UPDATE_BTN', { key: this.currentKey, status: 'unchanged' })
+
+          response = await this.$store.dispatch('translation/status', msg)
+
+          if (response.status === 200 && response.data.status) {
+            let status = response.data.status
+
+            this.$store.commit('translation/UPDATE_BTN', { key: this.currentKey, status })
+          }
         }
       }
     }

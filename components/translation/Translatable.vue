@@ -1,5 +1,5 @@
 <template lang="pug">
-  v-badge(v-model="isTranslating" left :color="color")
+  v-badge(v-model="isTranslating" left :color="color" class="translatable")
     v-icon(dark slot="badge" @click.capture.prevent="translate(i18n)") mode_edit
     slot
 </template>
@@ -35,6 +35,7 @@
         switch (this.status) {
           case 'updated': return 'warning'
           case 'missing': return 'error'
+          case 'new': return 'success'
           default: return 'grey'
         }
       }
@@ -79,3 +80,8 @@
     }
   }
 </script>
+
+<style lang="stylus">
+  .translatable
+    cursor: pointer
+</style>
